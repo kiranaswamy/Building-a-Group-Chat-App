@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+  <title>Chat UI</title>
+   <link rel="stylesheet" href="chatWindow.css">
+</head>
+<body>
+<div class="chat-container">
+    <div class="chat-header">chat</div>
+    <div class="chat-messages" id="chatMessage">
+        <div class="message received">Hi!
+            <div class="time">10:00 Am</div>
+        </div>
+        <div class="message sent">Hello
+            <div class="time">10:01 Am</div>
+        </div>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Type a message..."/>
+        <button id="sendBtn">send</button>
+    </div>
+</div>
+<script src="chatWindow.js"></script>
+</body>
+</html>

@@ -14,9 +14,9 @@ app.get('/',(req,res)=>{
     res.send('server is created')
 })
 
-app.use('./user',userRoutes)
+app.use('/user',userRoutes)
 
-db.sync({})
+db.sync({force:true})
 .then(()=>{
     app.listen(3000,()=>{
     console.log('server is running')
