@@ -1,26 +1,30 @@
-let chats = []; // in-memory storage
+// controller/chatController.js
+const Message = require('../models/messageModel');
 
-exports.sendMessage = (req, res) => {
-  const { sender, message } = req.body;
+exports.sendMessage = async (req, res) => {
+  try {
+    const { userId, message } = req.body;
 
-  if (!sender || !message) {
-    return res.status(400).json({ message: 'Sender and message required' });
+    if (!userId || !message) {
+      return res.status(400).json({ message: 'User and message required' });
+    }
+
+    const chat = await Message.create({
+      userId,
+      text:message
+    });
+
+    res.status(201).json(chat);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
   }
-
-  const chat = {
-    id: Date.now(),
-    sender,
-    message,
-    time: new Date().toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  };
-
-  chats.push(chat);
-  res.status(201).json(chat);
 };
 
-exports.getMessages = (req, res) => {
+exports.getMessages = async (req, res) => {
+  const chats = await Message.findAll({
+    include: ['User'],
+    order: [['createdAt', 'ASC']]
+  });
+
   res.status(200).json(chats);
 };

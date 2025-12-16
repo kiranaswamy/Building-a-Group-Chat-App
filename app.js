@@ -7,6 +7,8 @@ const db = require('./util/db-connect')
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 
+require('./models');
+
 app.use(express.json());
 app.use(cors());       
 

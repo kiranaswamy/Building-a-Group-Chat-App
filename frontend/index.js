@@ -51,6 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         console.log(response.data);
         alert('Signin successful!');
+
+        
+        localStorage.setItem('userId', response.data.userId);
+        window.location.href = 'chatWindow.html';
       } catch (error) {
         console.error(error.response.data);
         alert(error.response.data.message || 'Signin failed');
@@ -58,3 +62,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
