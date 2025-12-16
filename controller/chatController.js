@@ -1,4 +1,5 @@
 // controller/chatController.js
+
 const Message = require('../models/messageModel');
 
 exports.sendMessage = async (req, res) => {
@@ -14,13 +15,9 @@ exports.sendMessage = async (req, res) => {
       text: message
     });
 
-    // 🔴 WEBSOCKET ADDED (broadcast message)
-    if (global.wss) {
-      global.wss.clients.forEach(client => {
-        if (client.readyState === 1) {
-          client.send(JSON.stringify(chat));
-        }
-      });
+ 
+    if (global.io) {
+      global.io.emit("receiveMessage", chat);
     }
 
     res.status(201).json(chat);

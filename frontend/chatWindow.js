@@ -1,42 +1,18 @@
-// const input = document.getElementById('messageInput');
-// const send = document.getElementById('sendBtn');
-// const chatMessage = document.getElementById('chatMessage');
 
-// send.addEventListener('click', sendMessage);
-
-// function sendMessage() {
-//   const text = input.value.trim();
-//   if (!text) return;
-
-//   const msg = document.createElement('div');
-//   msg.className = 'message sent';
-//   msg.innerHTML = `
-//     ${text}
-//     <div class="time">
-//       ${new Date().toLocaleTimeString([], {
-//         hour: '2-digit',
-//         minute: '2-digit'
-//       })}
-//     </div>
-//   `;
-
-//   chatMessage.appendChild(msg);
-//   chatMessage.scrollTop = chatMessage.scrollHeight;
-//   input.value = '';
-// }
-
+if (!localStorage.getItem('userId')) {
+  localStorage.setItem('userId', Math.floor(Math.random() * 100000));
+}
 
 const input = document.getElementById('messageInput');
 const send = document.getElementById('sendBtn');
 const chatMessage = document.getElementById('chatMessage');
 
-// 🔴 WEBSOCKET ADDED
-const ws = new WebSocket("ws://localhost:3000");
 
-ws.onmessage = (e) => {
-  const data = JSON.parse(e.data);
+const socket = io("http://localhost:3000");
 
-  // don't duplicate your own sent messages
+
+socket.on("receiveMessage", (data) => {
+  
   if (data.userId == localStorage.getItem('userId')) return;
 
   const msg = document.createElement('div');
@@ -44,50 +20,35 @@ ws.onmessage = (e) => {
   msg.innerHTML = `
     ${data.text}
     <div class="time">
-      ${new Date(data.createdAt).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
-      })}
+      ${new Date(data.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
     </div>
   `;
-
   chatMessage.appendChild(msg);
   chatMessage.scrollTop = chatMessage.scrollHeight;
-};
-// 🔴 END
+});
 
-send.addEventListener('click', sendMessage);
 
-async function sendMessage() {
+send.addEventListener('click', () => {
   const text = input.value.trim();
   if (!text) return;
 
-  console.log('userId:', localStorage.getItem('userId')); 
-  console.log('message:', text);
+  const msgData = {
+    userId: localStorage.getItem('userId') || 1,
+    text
+  };
 
-  try {
-    await axios.post('http://localhost:3000/chat/send', {
-      userId: localStorage.getItem('userId'),
-      message: text
-    });
+  socket.emit("sendMessage", msgData);
 
-    const msg = document.createElement('div');
-    msg.className = 'message sent';
-    msg.innerHTML = `
-      ${text}
-      <div class="time">
-        ${new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit'
-        })}
-      </div>
-    `;
-
-    chatMessage.appendChild(msg);
-    chatMessage.scrollTop = chatMessage.scrollHeight;
-    input.value = '';
-
-  } catch (err) {
-    console.log(err);
-  }
-}
+  
+  const msg = document.createElement('div');
+  msg.className = 'message sent';
+  msg.innerHTML = `
+    ${text}
+    <div class="time">
+      ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+    </div>
+  `;
+  chatMessage.appendChild(msg);
+  chatMessage.scrollTop = chatMessage.scrollHeight;
+  input.value = '';
+});
