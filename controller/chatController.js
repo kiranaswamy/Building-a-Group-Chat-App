@@ -11,8 +11,17 @@ exports.sendMessage = async (req, res) => {
 
     const chat = await Message.create({
       userId,
-      text:message
+      text: message
     });
+
+    // 🔴 WEBSOCKET ADDED (broadcast message)
+    if (global.wss) {
+      global.wss.clients.forEach(client => {
+        if (client.readyState === 1) {
+          client.send(JSON.stringify(chat));
+        }
+      });
+    }
 
     res.status(201).json(chat);
   } catch (err) {
