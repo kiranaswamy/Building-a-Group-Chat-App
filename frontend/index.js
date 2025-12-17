@@ -54,7 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         
         localStorage.setItem('userId', response.data.userId);
-        window.location.href = 'chatWindow.html';
+        // window.location.href = 'chatWindow.html';
+        window.location.href = 'http://localhost:3000/chatWindow.html';
       } catch (error) {
         console.error(error.response.data);
         alert(error.response.data.message || 'Signin failed');
