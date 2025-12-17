@@ -62,6 +62,77 @@
 // .catch(err => console.log(err));
 
 
+// const express = require('express');
+// const cors = require('cors');
+// const path = require('path');
+// const http = require('http');
+// const { Server } = require('socket.io');
+
+// const userRoutes = require('./routes/userRoutes');
+// const chatRoutes = require('./routes/chatRoutes');
+// const Message = require('./models/messageModel');
+// const db = require('./util/db-connect');
+
+// const app = express();
+// app.use(express.json());
+// app.use(cors());
+
+
+// app.use(express.static(path.join(__dirname, 'frontend')));
+
+
+// app.use('/user', userRoutes);
+// app.use('/chat', chatRoutes);
+
+
+// app.get('/', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'frontend', 'chatWindow.html'));
+// });
+
+
+// const server = http.createServer(app);
+// const io = new Server(server);
+
+
+// io.on('connection', (socket) => {
+//   console.log('User connected:', socket.id);
+
+//   socket.on('chatMessage', async (data) => {
+//     try {
+      
+//       const savedMessage = await Message.create({
+//         text: data.text,
+//         userId: data.userId
+//       });
+
+      
+//       io.emit('chatMessage', {
+//         text: savedMessage.text,
+//         userId: savedMessage.userId,
+//         createdAt: savedMessage.createdAt
+//       });
+
+//       console.log(`Message from ${data.userId}: ${savedMessage.text}`);
+//     } catch (err) {
+//       console.error('DB error:', err);
+//     }
+//   });
+
+//   socket.on('disconnect', () => {
+//     console.log('User disconnected:', socket.id);
+//   });
+// });
+
+
+// db.sync({ force: true }) 
+//   .then(() => {
+//     server.listen(3000, () => {
+//       console.log('Server running on port 3000 with DB connected');
+//     });
+//   })
+//   .catch(err => console.error('DB connection error:', err));
+
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -70,61 +141,28 @@ const { Server } = require('socket.io');
 
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
-const Message = require('./models/messageModel');
 const db = require('./util/db-connect');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-
 app.use(express.static(path.join(__dirname, 'frontend')));
-
 
 app.use('/user', userRoutes);
 app.use('/chat', chatRoutes);
-
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'chatWindow.html'));
 });
 
-
 const server = http.createServer(app);
 const io = new Server(server);
 
+/* ✅ ONLY THIS LINE IS ADDED */
+require('./socket/socket')(io);
 
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-
-  socket.on('chatMessage', async (data) => {
-    try {
-      
-      const savedMessage = await Message.create({
-        text: data.text,
-        userId: data.userId
-      });
-
-      
-      io.emit('chatMessage', {
-        text: savedMessage.text,
-        userId: savedMessage.userId,
-        createdAt: savedMessage.createdAt
-      });
-
-      console.log(`Message from ${data.userId}: ${savedMessage.text}`);
-    } catch (err) {
-      console.error('DB error:', err);
-    }
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
-});
-
-
-db.sync({ force: true }) 
+db.sync({ force: true })
   .then(() => {
     server.listen(3000, () => {
       console.log('Server running on port 3000 with DB connected');
