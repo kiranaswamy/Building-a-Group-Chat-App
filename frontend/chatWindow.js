@@ -85,19 +85,67 @@
 
 // setInterval(fetchMessages, 1000);
 
+
+
+
+
+
+
+// const input = document.getElementById('messageInput');
+// const sendBtn = document.getElementById('sendBtn');
+// const chatMessage = document.getElementById('chatMessage');
+
+
+// if (!localStorage.getItem('userId')) {
+//   localStorage.setItem('userId', Math.floor(Math.random() * 100000));
+// }
+// const userId = localStorage.getItem('userId');
+// console.log(userId)
+
+
+// const socket = io("http://localhost:3000");
+// // const socket = io("http://localhost:3000", {
+// //   transports: ["websocket"]
+// // });
+
+
+
+// socket.on('chatMessage', (msg) => {
+//   const msgDiv = document.createElement('div');
+//   msgDiv.className = msg.userId == userId ? 'message sent' : 'message received';
+//   msgDiv.innerHTML = `
+//     ${msg.text}
+//     <div class="time">
+//       ${new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+//     </div>
+//   `;
+//   chatMessage.appendChild(msgDiv);
+//   chatMessage.scrollTop = chatMessage.scrollHeight;
+// });
+
+
+// sendBtn.addEventListener('click', () => {
+//   const text = input.value.trim();
+//   if (!text) return;
+
+//   const data = { text, userId };
+//   socket.emit('chatMessage', data);
+
+//   input.value = '';
+// });
+
+
 const input = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
 const chatMessage = document.getElementById('chatMessage');
-
 
 if (!localStorage.getItem('userId')) {
   localStorage.setItem('userId', Math.floor(Math.random() * 100000));
 }
 const userId = localStorage.getItem('userId');
-
+console.log(userId);
 
 const socket = io("http://localhost:3000");
-
 
 socket.on('chatMessage', (msg) => {
   const msgDiv = document.createElement('div');
@@ -112,13 +160,9 @@ socket.on('chatMessage', (msg) => {
   chatMessage.scrollTop = chatMessage.scrollHeight;
 });
 
-
 sendBtn.addEventListener('click', () => {
   const text = input.value.trim();
   if (!text) return;
-
-  const data = { text, userId };
-  socket.emit('chatMessage', data);
-
+  socket.emit('chatMessage', { text, userId });
   input.value = '';
 });
