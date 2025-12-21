@@ -7,12 +7,21 @@ const Message = sequelize.define('Message', {
     primaryKey: true,
     autoIncrement: true
   },
-  text: {
-    type: DataTypes.STRING,
+
+  message: {
+    type: DataTypes.TEXT,
     allowNull: false
   },
-  userId: {                     // ✅ REQUIRED
+ recipientId: {
     type: DataTypes.INTEGER,
+    allowNull: false
+  },
+    userId: {                      // 🔗 association
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  senderName: {              // ✅ for UI display
+    type: DataTypes.STRING,
     allowNull: false
   }
 });

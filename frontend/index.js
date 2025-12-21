@@ -90,8 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Store JWT token if returned from backend
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
-          localStorage.setItem('userId', response.data.userId);
-          localStorage.setItem('email', response.data.email);
+          localStorage.setItem('userId', response.data.user.id);
+          localStorage.setItem('email', response.data.user.email);
         }
 
         // Redirect to signin page after successful signup
@@ -130,8 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Store JWT token along with user info
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
-          localStorage.setItem('userId', response.data.userId);
-          localStorage.setItem('email', response.data.email);
+          localStorage.setItem('userId', response.data.user.id);
+          localStorage.setItem('email', response.data.user.email);
         }
 
         // Redirect to chat windowa
