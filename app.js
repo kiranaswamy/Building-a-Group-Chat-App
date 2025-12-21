@@ -144,10 +144,8 @@ const chatRoutes = require('./routes/chatRoutes');
 
 const Message = require('./models/messageModel');
 const User = require('./models/userModel');
-
-// ✅ ADD (group chat models + controller)
+const Group = require('./models/groupModel');
 const GroupMessage = require('./models/groupMessageModel');
-const { getGroupMessages } = require('./controller/groupController');
 
 const io = new Server(server, {
   cors: { origin: "*" }
@@ -163,16 +161,15 @@ app.get('/', (req, res) => {
 app.use('/user', userRoute);
 app.use('/chat', chatRoutes);
 
-// ✅ ADD (group messages API)
-app.get("/groups/:groupId/messages", getGroupMessages);
-
 require('./models');
 
 const onlineUsers = {};
 
+/* ================= SOCKET CONNECTION ================= */
 io.on('connection', (socket) => {
   console.log('User connected', socket.id);
 
+  /* ---------- REGISTER USER ---------- */
   socket.on("registerUser", async ({ email }) => {
     const user = await User.findOne({ where: { email } });
     if (!user) return;
@@ -192,10 +189,8 @@ io.on('connection', (socket) => {
     io.emit("onlineUsers", Object.values(onlineUsers));
   });
 
-  // ================= PERSONAL CHAT (UNCHANGED) =================
+  /* ================= PERSONAL CHAT ================= */
   socket.on('chatMessage', async (data) => {
-    console.log('user', socket.id, 'said:', data.message);
-
     try {
       const user = await User.findOne({ where: { email: data.email } });
       if (!user) return;
@@ -220,43 +215,44 @@ io.on('connection', (socket) => {
       });
 
     } catch (err) {
-      console.error('DB save error:', err);
+      console.error('Personal chat DB error:', err);
     }
   });
 
-  // ================= GROUP CHAT (ONLY ADDITION) =================
-  socket.on("joinGroup", (groupId) => {
-    socket.join(groupId);
-    console.log(`Socket ${socket.id} joined group ${groupId}`);
-  });
-
-  socket.on("groupMessage", async ({ groupId, username, message }) => {
+  /* ================= GROUP CHAT (AUTO GROUP) ================= */
+  socket.on("groupMessage", async ({ message, username }) => {
     if (!message) return;
 
     try {
-          const user = await User.findOne({ where: { email: username } });
-    if (!user) return;
+      // find user
+      const user = await User.findOne({ where: { email: username } });
+      if (!user) return;
 
-      await GroupMessage.create({
+      // auto-create ONE default group
+      let group = await Group.findOne({ where: { name: "DEFAULT_GROUP" } });
+      if (!group) {
+        group = await Group.create({ name: "DEFAULT_GROUP" });
+      }
+
+      // save message
+      const savedMessage = await GroupMessage.create({
         message,
-      senderId: user.id,
-      senderName: user.name,
-      groupId
+        senderId: user.id,
+        senderName: user.name,
+        groupId: group.id
       });
 
-      io.to(groupId).emit("groupMessage", {
-        groupId,
-        username: user.name,
-        message
-      });
+      // broadcast to all
+      io.emit("groupMessage", savedMessage);
+
     } catch (err) {
-      console.error("Group message save error:", err);
+      console.error("Group chat DB error:", err);
     }
   });
 });
 
-// ⚠️ FOR DEVELOPMENT ONLY
-db.sync({ force: true }).then(() => {
+/* ================= START SERVER ================= */
+db.sync({force:true}).then(() => {
   server.listen(3000, () => {
     console.log('socket.io server running on port 3000');
   });
