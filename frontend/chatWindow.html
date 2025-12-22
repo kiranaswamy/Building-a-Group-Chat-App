@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -35,5 +35,71 @@
     </div>
 </div>
 <script src="chatWindow.js"></script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/socket.io/socket.io.js"></script>
+
+  <title>Chat UI</title>
+  <link rel="stylesheet" href="chatWindow.css">
+</head>
+<body>
+
+  <!-- CONTACTS -->
+  <div class="contacts-container">
+    <h3>Contacts</h3>
+    <ul id="contacts"></ul>
+  </div>
+
+  <!-- SEARCH -->
+  <div id="searchContainer">
+    <input type="text" id="searchInput" placeholder="Search user by email..." />
+    <ul id="contacts">
+      <li id="groupChat">Group</li>
+    </ul>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-container" id="chatBox">
+    <div class="chat-header">chat</div>
+
+    <div class="chat-messages" id="chatMessage">
+      <div class="message received">
+        Hi!
+        <div class="time">10:00 Am</div>
+      </div>
+      <div class="message sent">
+        Hello
+        <div class="time">10:01 Am</div>
+      </div>
+    </div>
+
+    <!-- INPUT AREA -->
+    <div class="chat-input">
+
+      <!-- ✅ PREDICTIVE TYPING (ADDED) -->
+      <div id="predictiveSuggestions"></div>
+
+      <input
+        type="text"
+        id="messageInput"
+        placeholder="Type a message..."
+      />
+
+      <button onclick="sendBtn()">send</button>
+
+      <!-- ✅ SMART REPLIES (ADDED) -->
+      <div id="smartReplies"></div>
+
+    </div>
+  </div>
+
+  <script src="chatWindow.js"></script>
 </body>
 </html>
